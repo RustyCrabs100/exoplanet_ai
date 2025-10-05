@@ -1,9 +1,8 @@
 // Ctr + Shift + B to ubdate
 
-
-use std::error::Error;
-use csv::{ReaderBuilder};
+use csv::ReaderBuilder;
 use serde::Deserialize;
+use std::error::Error;
 
 #[derive(Debug, Deserialize, Clone)]
 struct Row {
@@ -18,15 +17,12 @@ fn row_ok(row: &Row) -> bool {
     row.key_value.is_some() && row.status != "candidate"
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+pub fn main_sk() -> Result<(), Box<dyn Error>> {
     // Hardcoded filename
-    let filename = "kepler_cumulative_2025.10.4_10.32.16.csv";
-
+    let filename = "data/koi_planets.csv";
 
     // Open the CSV file with headers
-    let mut rdr = ReaderBuilder::new()
-        .has_headers(true)
-        .from_path(filename)?;
+    let mut rdr = ReaderBuilder::new().has_headers(true).from_path(filename)?;
 
     let mut confirmed: Vec<Row> = Vec::new();
     let mut false_positive: Vec<Row> = Vec::new();
@@ -59,7 +55,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 /// If `pick_because_higher` is true, keeps the row with the higher value in each pair.
 fn prune_group(mut rows: Vec<Row>) -> Vec<Row> {
     rows.sort_by(|a, b| {
-        a.key_value.unwrap().partial_cmp(&b.key_value.unwrap()).unwrap()
+        a.key_value
+            .unwrap()
+            .partial_cmp(&b.key_value.unwrap())
+            .unwrap()
     });
 
     let mut current = rows;
@@ -106,6 +105,3 @@ fn prune_group(mut rows: Vec<Row>) -> Vec<Row> {
 
     current
 }
-
-
-
