@@ -2,7 +2,72 @@
 
 use csv::ReaderBuilder;
 use serde::{Deserialize, Serialize};
-use std::{error::Error, ops::Range};
+use std::{error::Error, f64, fs::File, io::Write, ops::Range, thread::scope};
+
+const NUM_FIELDS: usize = 24;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserRow {
+    dec: Range<f64>,
+    mag: Range<f64>,
+    orbital_period_days: Range<f64>,
+    transit_duration_hr: Range<f64>,
+    transit_depth_ppm: Range<f64>,
+    rp_over_rs: Range<f64>,
+    planet_radius_re: Range<f64>,
+    planet_eq_temp_k: Range<f64>,
+    stellar_teff_k: Range<f64>,
+    stellar_mass_ms: Range<f64>,
+    eccentricity: Range<f64>,
+    inclination_deg: Range<f64>,
+    semi_major_axis_au: Range<f64>,
+    planet_mass_me: Range<f64>,
+    planet_mass_mj: Range<f64>,
+    planet_density: Range<f64>,
+    insolation_flux: Range<f64>,
+    detection_snr: Range<f64>,
+    vetting_score: Range<f64>,
+    stellar_metallicity: Range<f64>,
+    stellar_logg: Range<f64>,
+}
+
+impl UserRow {
+    pub fn convert_from_vec_ranges_f64(ranges: Vec<Range<f64>>) -> Self {
+        if ranges.len() != NUM_FIELDS {
+            panic!("Expected {} ranges, got {}", NUM_FIELDS, ranges.len());
+        }
+        Self {
+            dec: ranges[0].clone(),
+            mag: ranges[1].clone(),
+            orbital_period_days: ranges[2].clone(),
+            transit_duration_hr: ranges[3].clone(),
+            transit_depth_ppm: ranges[4].clone(),
+            rp_over_rs: ranges[5].clone(),
+            planet_radius_re: ranges[6].clone(),
+            planet_eq_temp_k: ranges[7].clone(),
+            stellar_teff_k: ranges[8].clone(),
+            stellar_mass_ms: ranges[9].clone(),
+            eccentricity: ranges[10].clone(),
+            inclination_deg: ranges[11].clone(),
+            semi_major_axis_au: ranges[12].clone(),
+            planet_mass_me: ranges[13].clone(),
+            planet_mass_mj: ranges[14].clone(),
+            planet_density: ranges[15].clone(),
+            insolation_flux: ranges[16].clone(),
+            detection_snr: ranges[17].clone(),
+            vetting_score: ranges[18].clone(),
+            stellar_metallicity: ranges[19].clone(),
+            stellar_logg: ranges[20].clone(),
+        }
+    }
+
+    pub fn save_user_row(&self, path: &str) -> std::io::Result<()> {
+        let mut file = File::create(path)?;
+        let json = serde_json::to_string_pretty(self).unwrap();
+        file.write_all(json.as_bytes())?;
+        Ok(())
+    }
+}
 
 /// This is the struct that is outputted after converting the .csv data into Rust data
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -216,7 +281,10 @@ impl std::fmt::Display for TrainingRow {
 impl TrainingRow {
     /// Get rid of rows that are candidates
     pub fn row_ok(&self) -> bool {
-        self.status != "candidate" && self.status != "pc" && self.status != "apc"
+        self.status != "candidate"
+            && self.status != "pc"
+            && self.status != "apc"
+            && self.status != "refuted"
     }
 }
 
@@ -226,9 +294,15 @@ pub fn call_ai() {
     // This holds all the training data for non-exoplanets
     let mut all_false: Vec<TrainingRow> = Vec::new();
     // Collect all the training data and split them
-    let (k2_p_t, k2_p_f) = read_csv("data\\k2_planets.csv").expect("uh oh");
-    let (koi_p_t, koi_p_f) = read_csv("data\\koi_planets.csv").expect("un oh 2");
-    let (toi_p_t, toi_p_f) = read_csv("data\\toi_planets.csv").expect("uh oh 3");
+    let (k2_p_t, k2_p_f) =
+        read_csv("C:\\Users\\metee\\Downloads\\Rust_Coding\\exoplanet_ai\\data\\k2_planets.csv")
+            .expect("uh oh");
+    let (koi_p_t, koi_p_f) =
+        read_csv("C:\\Users\\metee\\Downloads\\Rust_Coding\\exoplanet_ai\\data\\koi_planets.csv")
+            .expect("un oh 2");
+    let (toi_p_t, toi_p_f) =
+        read_csv("C:\\Users\\metee\\Downloads\\Rust_Coding\\exoplanet_ai\\data\\toi_planets.csv")
+            .expect("uh oh 3");
     // MERGE MERGE MERGE
     all_confirmed.extend(k2_p_t);
     all_confirmed.extend(koi_p_t);
@@ -236,7 +310,11 @@ pub fn call_ai() {
     all_false.extend(k2_p_f);
     all_false.extend(koi_p_f);
     all_false.extend(toi_p_f);
-    let _ = iter_compare_planet_rows(all_confirmed, all_false);
+    let x = iter_compare_planet_rows(all_confirmed, all_false);
+    let user_row = UserRow::convert_from_vec_ranges_f64(x);
+    user_row
+        .save_user_row("C:\\Users\\metee\\Downloads\\Rust_Coding\\exoplanet_ai\\data\\output.json")
+        .expect("Failed to save user row");
 }
 
 /// Reads the data from the .csv file inputted into this function.
@@ -270,25 +348,98 @@ fn read_csv(csv_file: &str) -> Result<(Vec<TrainingRow>, Vec<TrainingRow>), Box<
         if !row.row_ok() {
             continue;
         }
-        match row.status.trim().to_lowercase().as_str() {
+        match row
+            .status
+            .trim()
+            .trim_matches(|c: char| c.is_control())
+            .to_lowercase()
+            .replace(|c: char| c.is_whitespace() || c.is_control(), "")
+            .as_str()
+        {
             "confirmed" => confirmed.push(row),
             "kp" => confirmed.push(row),
             "cp" => confirmed.push(row),
             "validated" => confirmed.push(row),
-            "false positive" => not_a_planet.push(row),
+            "falsepositive" => not_a_planet.push(row),
             "fp" => not_a_planet.push(row),
             "fa" => not_a_planet.push(row),
-            other => eprintln!("Unexpected input, {}", other),
+            _ => (),
         }
     }
-    println!("{:#?}", confirmed);
-    println!("{:#?}", not_a_planet);
     Ok((confirmed, not_a_planet))
 }
 
+/// Iterate over the 2 rows and compare them, returning a Vec of Ranges collected.
 fn iter_compare_planet_rows(
     mut true_rows: Vec<TrainingRow>,
     mut false_rows: Vec<TrainingRow>,
-) -> Range<f64> {
-    todo!()
+) -> Vec<Range<f64>> {
+    scope(|s| {
+        let mut t = true_rows;
+        let mut f = false_rows;
+        // Compare over true_rows
+        let h1 = s.spawn(move || iter_compare_planet_rows_helper(t, true));
+        // Compare over false_rows
+        let h2 = s.spawn(move || iter_compare_planet_rows_helper(f, false));
+
+        while !(h1.is_finished() && h2.is_finished()) {}
+        let max_vals = h1.join().unwrap();
+        let min_vals = h2.join().unwrap();
+
+        max_vals
+            .into_iter()
+            .zip(min_vals.into_iter())
+            .map(|(max, min)| if min <= max { min..max } else { max..min })
+            .collect::<Vec<Range<f64>>>()
+    })
+}
+
+/// Iterate over the rows and compare them, returning a Vec of f64's, which is either the highest or the smallest in the range depending on the 2nd input
+fn iter_compare_planet_rows_helper(mut rows: Vec<TrainingRow>, highest: bool) -> Vec<f64> {
+    let mut results = vec![None; NUM_FIELDS];
+
+    for row in rows.drain(..) {
+        let fields = [
+            row.ra,
+            row.dec,
+            row.mag,
+            row.orbital_period_days,
+            row.transit_epoch_bjd,
+            row.transit_duration_hr,
+            row.transit_depth_ppm,
+            row.rp_over_rs,
+            row.planet_radius_re,
+            row.planet_eq_temp_k,
+            row.stellar_teff_k,
+            row.stellar_mass_ms,
+            row.eccentricity,
+            row.inclination_deg,
+            row.semi_major_axis_au,
+            row.planet_mass_me,
+            row.planet_mass_mj,
+            row.planet_density,
+            row.insolation_flux,
+            row.detection_snr,
+            row.vetting_score,
+            row.stellar_metallicity,
+            row.stellar_logg,
+        ];
+
+        for (slot, val) in results.iter_mut().zip(fields.into_iter()) {
+            if let Some(v) = val {
+                match slot {
+                    Some(current) => {
+                        if highest && v > *current {
+                            *slot = Some(v);
+                        } else if !highest && v < *current {
+                            *slot = Some(v);
+                        }
+                    }
+                    None => *slot = Some(v),
+                }
+            }
+        }
+    }
+
+    results.into_iter().map(|x| x.unwrap_or(f64::NAN)).collect()
 }

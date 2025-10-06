@@ -44,10 +44,10 @@ function App() {
           <h1 className="title">RUSTY PLANET FINDER</h1>
           <h2 className="version">V 0.1</h2>
         </header>
-        
+
         <div className="main-content">
           <Planet />
-          <InputForm 
+          <InputForm
             formData={formData}
             onInputChange={handleInputChange}
             onReset={handleReset}
