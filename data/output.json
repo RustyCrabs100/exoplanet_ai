@@ -1,0 +1,86 @@
+{
+  "dec": {
+    "start": 0.315071,
+    "end": 359.900874
+  },
+  "mag": {
+    "start": -87.269735,
+    "end": 86.860343
+  },
+  "orbital_period_days": {
+    "start": null,
+    "end": null
+  },
+  "transit_duration_hr": {
+    "start": 0.1638211,
+    "end": 4700.0
+  },
+  "transit_depth_ppm": {
+    "start": 120.5159138,
+    "end": 2460812.205917
+  },
+  "rp_over_rs": {
+    "start": 0.1046,
+    "end": 24.708
+  },
+  "planet_radius_re": {
+    "start": 0.8,
+    "end": 36912.0
+  },
+  "planet_eq_temp_k": {
+    "start": null,
+    "end": null
+  },
+  "stellar_teff_k": {
+    "start": 0.08,
+    "end": 77.76
+  },
+  "stellar_mass_ms": {
+    "start": 92.0,
+    "end": 3907.0
+  },
+  "eccentricity": {
+    "start": 2586.0,
+    "end": 9918.0
+  },
+  "inclination_deg": {
+    "start": 0.169168,
+    "end": 2.83
+  },
+  "semi_major_axis_au": {
+    "start": 0.853,
+    "end": null
+  },
+  "planet_mass_me": {
+    "start": null,
+    "end": null
+  },
+  "planet_mass_mj": {
+    "start": 0.0034,
+    "end": 4.5
+  },
+  "planet_density": {
+    "start": 4131.79,
+    "end": null
+  },
+  "insolation_flux": {
+    "start": 13.0,
+    "end": null
+  },
+  "detection_snr": {
+    "start": null,
+    "end": null
+  },
+  "vetting_score": {
+    "start": 0.0187275,
+    "end": 38711.5
+  },
+  "stellar_metallicity": {
+    "start": 0.0,
+    "end": 5945.9
+  },
+  "stellar_logg": {
+    "start": 0.0,
+    "end": 1.0
+  }
+}
