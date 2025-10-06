@@ -1,88 +1,57 @@
 import React from 'react'
 import './InputForm.css'
 
-const InputForm = ({ formData, onInputChange, onReset, onCalculate }) => {
-  const handleInputChange = (field, value) => {
-    onInputChange(field, value)
-  }
+const FIELDS = [
+  { key: 'radius', label: 'Radius', placeholder: 'Earths' },
+  { key: 'density', label: 'Density', placeholder: 'g/cm³' },
+  { key: 'parsecs', label: 'Parsecs from Earth', placeholder: 'Parsecs' },
+  { key: 'planetMass', label: 'Planet Mass', placeholder: 'Earths' },
+  { key: 'vMagnitude', label: 'V (Johnson) Magnitude', placeholder: 'Magnitude' },
+  { key: 'orbitalPeriod', label: 'Orbital Period', placeholder: 'Days' },
+  { key: 'eccentricity', label: 'Eccentricity', placeholder: '' },
+  { key: 'insolation', label: 'Insolation Flux', placeholder: 'Earth flux' },
+  { key: 'eqTemp', label: 'Equilibrium Temperature', placeholder: 'Kelvin' },
+  { key: 'stellarType', label: 'Stellar Type', placeholder: 'Spectral Type' },
+  { key: 'stellarTeff', label: 'Stellar Effective Temp', placeholder: 'Kelvin' },
+  { key: 'stellarRadius', label: 'Stellar Radius', placeholder: 'Solar Radius' },
+  { key: 'stellarMass', label: 'Stellar Mass', placeholder: 'Solar Mass' },
+  { key: 'stellarMetallicity', label: 'Stellar Metallicity', placeholder: 'dex' },
+  { key: 'stellarGravity', label: 'Stellar Surface Gravity', placeholder: 'log10(cm/s²)' },
+  { key: 'systemDistance', label: 'System Distance', placeholder: 'pc' },
+  { key: 'systemVmag', label: 'System V Magnitude', placeholder: 'Magnitude' },
+  { key: 'systemKmag', label: 'System Ks Magnitude', placeholder: 'Magnitude' },
+  { key: 'systemGaiaMag', label: 'Gaia Magnitude', placeholder: 'Magnitude' },
+  { key: 'ra', label: 'Right Ascension (RA)', placeholder: 'deg' },
+  { key: 'dec', label: 'Declination (Dec)', placeholder: 'deg' },
+  { key: 'hostName', label: 'Host Name', placeholder: 'Star Name' },
+  { key: 'planetName', label: 'Planet Name', placeholder: 'Name' },
+  { key: 'discoveryMethod', label: 'Discovery Method', placeholder: 'Method' }
+]
 
+const InputForm = ({ formData, onInputChange, onReset, onCalculate }) => {
   return (
     <div className="input-form">
       <div className="input-grid">
-        <div className="input-group">
-          <label className="input-label">Radius</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.radius}
-            onChange={(e) => handleInputChange('radius', e.target.value)}
-            placeholder="Earths"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">Density</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.density}
-            onChange={(e) => handleInputChange('density', e.target.value)}
-            placeholder="g/cm**3"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">Parsecs from Earth</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.parsecs}
-            onChange={(e) => handleInputChange('parsecs', e.target.value)}
-            placeholder="Parsecs"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">Planet mass</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.planetMass}
-            onChange={(e) => handleInputChange('planetMass', e.target.value)}
-            placeholder="Earths"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">V (Johnson) magnitude</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.vMagnitude}
-            onChange={(e) => handleInputChange('vMagnitude', e.target.value)}
-            placeholder="Magnitude"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">Orbital Period</label>
-          <input
-            type="text"
-            className="input-field"
-            value={formData.orbitalPeriod}
-            onChange={(e) => handleInputChange('orbitalPeriod', e.target.value)}
-            placeholder="Days"
-          />
-        </div>
+        {FIELDS.map(field => (
+          <div className="input-group" key={field.key}>
+            <label className="input-label">{field.label}</label>
+            <input
+              type="text"
+              className="input-field"
+              value={formData[field.key] || ''}
+              onChange={e => onInputChange(field.key, e.target.value)}
+              placeholder={field.placeholder}
+            />
+          </div>
+        ))}
       </div>
-
       <div className="button-group">
         <span className="button-group-label">Button Group</span>
         <div className="buttons">
-          <button className="btn btn-reset" onClick={onReset}>
+          <button className="btn btn-reset" type="button" onClick={onReset}>
             Reset
           </button>
-          <button className="btn btn-calculate" onClick={onCalculate}>
+          <button className="btn btn-calculate" type="button" onClick={onCalculate}>
             Calculate
           </button>
         </div>

@@ -1,9 +1,9 @@
 .app {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   background: #000;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .content {
@@ -18,44 +18,152 @@
   padding: 20px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.title {
-  font-size: 48px;
-  font-weight: bold;
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-}
-
-.version {
-  font-size: 24px;
-  font-weight: normal;
-  letter-spacing: 2px;
-  opacity: 0.8;
-}
-
-.main-content {
+/* App background and centering */
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #222 0%, #444 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 60px;
+  justify-content: flex-start;
+  padding: 0;
 }
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 32px;
-    letter-spacing: 2px;
-  }
-  
-  .version {
-    font-size: 18px;
-  }
-  
+/* Header styles */
+.header {
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.version {
+  font-size: 1.1rem;
+  color: #ddd;
+  opacity: 0.7;
+}
+
+/* Main content area: scrollable card */
+.main-content {
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  padding: 24px 18px;
+  width: 100%;
+  max-width: 900px;
+  min-height: 400px;
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form styles */
+form {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+form>* {
+  flex: 1 1 220px;
+  min-width: 160px;
+  max-width: 260px;
+}
+
+/* Input styles */
+input,
+select,
+button {
+  font-size: 1rem;
+  padding: 8px 12px;
+  margin: 0;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  box-sizing: border-box;
+  transition: border 0.2s;
+}
+
+input:focus,
+select:focus {
+  border-color: #0077ff;
+  outline: none;
+}
+
+button {
+  background: #0077ff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #005bb5;
+}
+
+/* List styles */
+.planet-list,
+.bulk-results {
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  padding: 8px;
+}
+
+/* Headings */
+h1,
+h2,
+h3 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  color: #222;
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
   .main-content {
-    gap: 40px;
+    max-width: 98vw;
+    padding: 12px 4px;
+  }
+
+  form>* {
+    min-width: 120px;
+    max-width: 98vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .main-content {
+    padding: 8px 2px;
+    min-height: 300px;
+    max-height: 80vh;
+  }
+
+  form {
+    gap: 8px;
   }
 }
